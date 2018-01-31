@@ -1,8 +1,0 @@
-{
-	"BuildId": "c613a200-6d43-40c0-8f25-7caead03a40b",
-	"Modules": 
-	{
-		"HTML5PlatformEditor": "UE4Editor-HTML5PlatformEditor.dll",
-		"HTML5TargetPlatform": "UE4Editor-HTML5TargetPlatform.dll"
-	}
-}

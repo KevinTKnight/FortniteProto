@@ -1,0 +1,26 @@
+Lift = [Coefficent of lift] * ( [.5 rho (air density)] * [velocity^2] * [wing surface area])
+
+********** Lift **********
+- newton 
+- what the fuck's a newton
+- "the SI unit of force. It is equal to the force that would give a mass of one 
+	kilogram an acceleration of one meter per second per second."
+- acceleration (added to velocity) / mass of plane? (in kg)
+- thanks, google
+
+********** Coefficent of Lift **********
+- always between 0 and 2
+- Angle of attack and wing shape make this up  
+- Usually found via experimentation
+- Fuck it, boeings uses .52 I fucking guess
+
+********** Air Density **********
+-kilogram/meter^3 
+
+********** Velocity **********
+- meter/second
+
+********** Wing Surface Area **********
+- meter^2
+- Can also be made up for our purposes, until later
+

@@ -108,6 +108,11 @@
 !VERSION
 !ChangeLog
 
+#Managed by LFS
+!*.uasset
+!*.uproject
+!*.umap
+
 # Ignore Unix backup files
 *~
 
@@ -150,8 +155,23 @@ Engine/Binaries/DotNET/AutomationScripts/BuildGraph.Automation.xml
 # Ignore version files in the Engine/Binaries directory created by UBT
 /Engine/Binaries/**/*.version
 
-# Ignore content folders
+# Ignore content folders (now we ignore ignoring content folders cuz of LFS?)
 Content/
+!*Skybound/Content
+#Ignore only ENGINE content (we don't need to push all this)
+*Engine/Content
+# Ignore sample content
+*Samples/
+# Ignore starter content (already not needed?)
+*StarterContent/
+# Ignore Templates (also not needed to push)
+/Templates/*
+
+# Ignore fortnite files (for now)
+*Fortnite/
+
+# GTFO, help files
+*.udn
 
 # Ignore DDC
 /Engine/DerivedDataCache/**

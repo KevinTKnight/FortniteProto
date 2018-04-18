@@ -40,7 +40,7 @@ if errorlevel 1 goto Error_UBTCompileFailed
 rem ## Execute UBT
 :ReadyToClean
 if not exist ..\..\Engine\Binaries\DotNET\UnrealBuildTool.exe goto Error_UBTMissing
-..\..\Engine\Binaries\DotNET\UnrealBuildTool.exe %* -clean
+..\..\Engine\Binaries\DotNET\UnrealBuildTool.exe %* -clean -noxge
 goto Exit
 
 

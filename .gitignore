@@ -34,6 +34,9 @@
 !*.def
 !*.exp
 !*.manifest
+# For our documentation process / GDDs
+!*.docx
+!*.doc
 
 # Re-ignore vs host manifest
 *.vshost.exe.manifest

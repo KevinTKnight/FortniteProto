@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "WheeledVehicle.h"
+#include "GameFramework/Pawn.h"
 #include "SkyboundPawn.generated.h"
 
 class UPhysicalMaterial;
@@ -14,7 +14,7 @@ class UInputComponent;
 class UAudioComponent;
 
 UCLASS(config=Game)
-class ASkyboundPawn : public AWheeledVehicle
+class ASkyboundPawn : public APawn
 {
 	GENERATED_BODY()
 
@@ -82,14 +82,41 @@ public:
 
 	// Begin Actor interface
 	virtual void Tick(float Delta) override;
+
+	/** Returns Mesh subobject **/
+	FORCEINLINE USkeletalMeshComponent* ASkyboundPawn::GetMesh() const { return Mesh; }
 protected:
 	virtual void BeginPlay() override;
 
 public:
 	// End Actor interface
 
-	/** Handle pressing forwards */
-	void MoveForward(float Val);
+	/* In meters per second */
+	UPROPERTY(Category = Flight, EditAnywhere)
+	float MaxEngineVelocity = 100;
+
+	/* In meters per second */
+	UPROPERTY(Category = Flight, EditAnywhere)
+	float MinEngineVelocity = 0;
+
+	/* In meters per second */
+	UPROPERTY(Category = Flight, EditAnywhere)
+	float BaseEngineAcceleration = 10;
+	
+	/****** INPUT BINDING FUNCTION*****/
+	/** Handle Pitch input */
+	void Pitch(float Val);
+
+	/** Handle Yaw input */
+	void Yaw(float Val);
+
+	/** Handle Roll input */
+	void Roll(float Val);
+
+	/** Handle acceleration / deceleration */
+	void Accelerate(float Val);
+
+	/****** END INPUT BINDING *****/
 
 	/** Setup the strings used on the hud */
 	void SetupInCarHUD();
@@ -130,6 +157,9 @@ private:
 	/** Non Slippery Material instance */
 	UPhysicalMaterial* NonSlipperyMaterial;
 
+	/** The main skeletal mesh associated with this Character (optional sub-object). */
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class USkeletalMeshComponent* Mesh;
 
 public:
 	/** Returns SpringArm subobject **/

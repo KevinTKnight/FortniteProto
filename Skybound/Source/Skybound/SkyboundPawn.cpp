@@ -34,10 +34,19 @@ const FName ASkyboundPawn::EngineAudioRPM("RPM");
 
 ASkyboundPawn::ASkyboundPawn()
 {
+	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkyboundMeshComponent"));
+	Mesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	Mesh->BodyInstance.bSimulatePhysics = true;
+	RootComponent = Mesh;
+
 	// Car mesh
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CarMesh(TEXT("/Game/VehicleAdv/Vehicle/Vehicle_SkelMesh.Vehicle_SkelMesh"));
-	GetMesh()->SetSkeletalMesh(CarMesh.Object);
-	GetMesh()->SetRelativeScale3D(FVector(3.0f, 1.0f, 1.0f));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CarMesh(TEXT("/Game/Geometry/Meshes/PlaneTest.PlaneTest"));
+	
+	if (GetMesh())
+	{
+		GetMesh()->SetSkeletalMesh(CarMesh.Object);
+		GetMesh()->SetRelativeScale3D(FVector(3.0f, 1.0f, 1.0f));
+	}
 	
 // 	static ConstructorHelpers::FClassFinder<UObject> AnimBPClass(TEXT("/Game/VehicleAdv/Vehicle/VehicleAnimationBlueprint"));
 // 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
@@ -52,7 +61,7 @@ ASkyboundPawn::ASkyboundPawn()
 
 	// Create a spring arm component for our chase camera
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	SpringArm->SetRelativeLocation(FVector(0.0f, 0.0f, 34.0f));
+	SpringArm->SetRelativeLocation(FVector(-750.0f, 0.0f, 100.0f));
 	SpringArm->SetWorldRotation(FRotator(-20.0f, 0.0f, 0.0f));
 	SpringArm->SetupAttachment(RootComponent);
 	SpringArm->TargetArmLength = 125.0f;
@@ -128,24 +137,43 @@ void ASkyboundPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInput
 
 void ASkyboundPawn::Pitch(float Val)
 {
-	//TODO: pitch input
+	if (Val != 0)
+	{
+		// TODO: Expose scaling factor and respect plane's facing when constructing rotation vector
+		GetMesh()->AddAngularImpulseInDegrees(FVector(0.f, Val * 5.f, 0.f), NAME_None, true);
+	}
 }
 
 void ASkyboundPawn::Yaw(float Val)
 {
-	//TODO: yaw input
+	if (Val != 0)
+	{
+		// TODO: Expose scaling factor and respect plane's facing when constructing rotation vector
+		GetMesh()->AddAngularImpulseInDegrees(FVector(0.f, 0.f, -Val * 5.f), NAME_None, true);
+	}
 }
 
 void ASkyboundPawn::Roll(float Val)
 {
-	//TODO: Roll input
+	if (Val != 0)
+	{
+		// TODO: Expose scaling factor and respect plane's facing when constructing rotation vector
+		GetMesh()->AddAngularImpulseInDegrees(FVector(Val * 5.f, 0.f, 0.f), NAME_None, true);
+	}
 }
 
 void ASkyboundPawn::Accelerate(float Val)
 {
-	//TODO: Accelerate input
-	UE_LOG(LogSkyboundPawn, Log, TEXT("Adding Acceleration"));
-	Internal_AddMovementInput(this->GetActorForwardVector() * BaseEngineAcceleration * Val, true);
+	if (Val != 0.f)
+	{
+		GetMesh()->AddImpulse(this->GetActorForwardVector() * BaseEngineAcceleration * Val, NAME_None, true);
+
+		if (Val > 0.f)
+		{
+			// hacky lift
+			GetMesh()->AddImpulse(this->GetActorUpVector() * BaseEngineAcceleration * Val, NAME_None, true);
+		}
+	}
 }
 
 void ASkyboundPawn::MoveRight(float Val)

@@ -139,8 +139,7 @@ void ASkyboundPawn::Pitch(float Val)
 {
 	if (Val != 0)
 	{
-		// TODO: Expose scaling factor and respect plane's facing when constructing rotation vector
-		GetMesh()->AddAngularImpulseInDegrees(FVector(0.f, Val * 5.f, 0.f), NAME_None, true);
+		GetMesh()->AddAngularImpulseInDegrees(Val * PitchDegreesPerFrame * GetActorRightVector(), NAME_None, true);
 	}
 }
 
@@ -148,8 +147,7 @@ void ASkyboundPawn::Yaw(float Val)
 {
 	if (Val != 0)
 	{
-		// TODO: Expose scaling factor and respect plane's facing when constructing rotation vector
-		GetMesh()->AddAngularImpulseInDegrees(FVector(0.f, 0.f, -Val * 5.f), NAME_None, true);
+		GetMesh()->AddAngularImpulseInDegrees(Val * YawDegreesPerFrame * GetActorUpVector(), NAME_None, true);
 	}
 }
 
@@ -157,8 +155,7 @@ void ASkyboundPawn::Roll(float Val)
 {
 	if (Val != 0)
 	{
-		// TODO: Expose scaling factor and respect plane's facing when constructing rotation vector
-		GetMesh()->AddAngularImpulseInDegrees(FVector(Val * 5.f, 0.f, 0.f), NAME_None, true);
+		GetMesh()->AddAngularImpulseInDegrees(Val * RollDegreesPerFrame * GetActorForwardVector(), NAME_None, true);
 	}
 }
 

@@ -102,6 +102,18 @@ public:
 	/* In meters per second */
 	UPROPERTY(Category = Flight, EditAnywhere)
 	float BaseEngineAcceleration = 10;
+
+	/* In meters per second */
+	UPROPERTY(Category = Flight, EditAnywhere)
+	float PitchDegreesPerFrame = 1;
+
+	/* In meters per second */
+	UPROPERTY(Category = Flight, EditAnywhere)
+	float YawDegreesPerFrame = 1;
+
+	/* In meters per second */
+	UPROPERTY(Category = Flight, EditAnywhere)
+	float RollDegreesPerFrame = 1;
 	
 	/****** INPUT BINDING FUNCTION*****/
 	/** Handle Pitch input */

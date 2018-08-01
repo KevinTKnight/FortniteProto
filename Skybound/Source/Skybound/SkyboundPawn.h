@@ -93,27 +93,43 @@ public:
 
 	/* In meters per second */
 	UPROPERTY(Category = Flight, EditAnywhere)
-	float MaxEngineVelocity = 100;
+	float InitialVelocity = 2000.0f;
 
-	/* In meters per second */
+	/* Engine force applied via ActorForwardVector per second = PlaneMass * BaseEngineAcceleration */
 	UPROPERTY(Category = Flight, EditAnywhere)
-	float MinEngineVelocity = 0;
+	float BaseEngineAcceleration = 2.0f;
 
-	/* In meters per second */
+	/* Drag Force applied against horizontal velocity per second: DragCoefficient * 0.5f * AirDensity * HorizontalVelocityMagnitudeSquared * WingArea */
 	UPROPERTY(Category = Flight, EditAnywhere)
-	float BaseEngineAcceleration = 10;
+	float DragCoefficient = 0.01f;
 
-	/* In meters per second */
+	/* Lift Force applied via ActorUpVector per second: LiftCoefficient * 0.5f * AirDensity * HorizontalVelocityMagnitudeSquared * WingArea */
 	UPROPERTY(Category = Flight, EditAnywhere)
-	float PitchDegreesPerFrame = 1;
+	float LiftCoefficient = 0.01f;
 
-	/* In meters per second */
+	/* Scales linearly with Lift/Drag */
 	UPROPERTY(Category = Flight, EditAnywhere)
-	float YawDegreesPerFrame = 1;
+	float AirDensity = 1.0f;
 
-	/* In meters per second */
+	/* Scales linearly with Lift/Drag */
 	UPROPERTY(Category = Flight, EditAnywhere)
-	float RollDegreesPerFrame = 1;
+	float WingArea = 1.0f;
+
+	/* Used for applying forces other than Lift/Drag */
+	UPROPERTY(Category = Flight, EditAnywhere)
+	float PlaneMass = 1000.0f;
+
+	/* Pitch Torque per second = PlaneMass * PitchAccelerationPerFrame */
+	UPROPERTY(Category = Flight, EditAnywhere)
+	float PitchAccelerationPerFrame = 0.1f;
+
+	/* Yaw Torque per second = PlaneMass * YawAccelerationPerFrame */
+	UPROPERTY(Category = Flight, EditAnywhere)
+	float YawAccelerationPerFrame = 0.1f;
+
+	/* Roll Torque per second = PlaneMass * YawAccelerationPerFrame */
+	UPROPERTY(Category = Flight, EditAnywhere)
+	float RollAccelerationPerFrame = 0.1f;
 	
 	/****** INPUT BINDING FUNCTION*****/
 	/** Handle Pitch input */
@@ -152,6 +168,15 @@ public:
 	static const FName EngineAudioRPM;
 
 private:
+
+	/** Per frame data */
+	float PitchMultiplierThisFrame;
+	float YawMultiplierThisFrame;
+	float RollMultiplierThisFrame;
+	float AccelerationMultiplierThisFrame;
+
+	void ResetFrameData();
+
 	/** 
 	 * Activate In-Car camera. Enable camera and sets visibility of incar hud display
 	 *

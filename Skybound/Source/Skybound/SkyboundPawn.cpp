@@ -47,7 +47,7 @@ ASkyboundPawn::ASkyboundPawn()
 		GetMesh()->SetSkeletalMesh(CarMesh.Object);
 		GetMesh()->SetRelativeScale3D(FVector(3.0f, 1.0f, 1.0f));
 	}
-	
+
 // 	static ConstructorHelpers::FClassFinder<UObject> AnimBPClass(TEXT("/Game/VehicleAdv/Vehicle/VehicleAnimationBlueprint"));
 // 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 // 	GetMesh()->SetAnimInstanceClass(AnimBPClass.Class);
@@ -139,7 +139,7 @@ void ASkyboundPawn::Pitch(float Val)
 {
 	if (Val != 0)
 	{
-		GetMesh()->AddAngularImpulseInDegrees(Val * PitchDegreesPerFrame * GetActorRightVector(), NAME_None, true);
+		GetMesh()->AddTorqueInDegrees(PlaneMass * Val * PitchAccelerationPerFrame * GetActorRightVector(), NAME_None, true);
 	}
 }
 
@@ -147,7 +147,7 @@ void ASkyboundPawn::Yaw(float Val)
 {
 	if (Val != 0)
 	{
-		GetMesh()->AddAngularImpulseInDegrees(Val * YawDegreesPerFrame * GetActorUpVector(), NAME_None, true);
+		GetMesh()->AddTorqueInDegrees(PlaneMass * Val * YawAccelerationPerFrame * GetActorUpVector(), NAME_None, true);
 	}
 }
 
@@ -155,7 +155,7 @@ void ASkyboundPawn::Roll(float Val)
 {
 	if (Val != 0)
 	{
-		GetMesh()->AddAngularImpulseInDegrees(Val * RollDegreesPerFrame * GetActorForwardVector(), NAME_None, true);
+		GetMesh()->AddTorqueInDegrees(PlaneMass * Val * RollAccelerationPerFrame * GetActorForwardVector(), NAME_None, true);
 	}
 }
 
@@ -163,13 +163,7 @@ void ASkyboundPawn::Accelerate(float Val)
 {
 	if (Val != 0.f)
 	{
-		GetMesh()->AddImpulse(this->GetActorForwardVector() * BaseEngineAcceleration * Val, NAME_None, true);
-
-		if (Val > 0.f)
-		{
-			// hacky lift
-			GetMesh()->AddImpulse(this->GetActorUpVector() * BaseEngineAcceleration * Val, NAME_None, true);
-		}
+		GetMesh()->AddForce(PlaneMass * this->GetActorForwardVector() * BaseEngineAcceleration * Val, NAME_None, true);
 	}
 }
 
@@ -219,6 +213,42 @@ void ASkyboundPawn::EnableIncarView(const bool bState)
 void ASkyboundPawn::Tick(float Delta)
 {
 	Super::Tick(Delta);
+
+	FVector HorizontalVelocity = GetVelocity();
+	HorizontalVelocity.Z = 0.f;
+
+	FVector HorizontalForwardVector = HorizontalVelocity;
+	HorizontalForwardVector.Normalize();
+
+	// Overall velocity projected on the forward vector to get forward velocity
+	float HorizontalVelocityMagnitudeSquared = HorizontalVelocity.SizeSquared();
+	float LiftAndDragScalingValue = 0.5f * AirDensity * HorizontalVelocityMagnitudeSquared * WingArea;
+	
+	// Upward lift force caused by forward motion
+	GetMesh()->AddForce(Delta * LiftCoefficient * GetActorUpVector() * LiftAndDragScalingValue, NAME_None, true);
+
+	// Backward drag force cause by forward motion
+	GetMesh()->AddForce(Delta * DragCoefficient * -HorizontalForwardVector * LiftAndDragScalingValue, NAME_None, true);
+
+	// Forward acceleration caused by engine (and backwards acceleration caused by brakes)
+	if (AccelerationMultiplierThisFrame)
+	{
+		GetMesh()->AddForce(Delta * PlaneMass * BaseEngineAcceleration * AccelerationMultiplierThisFrame * GetActorForwardVector(), NAME_None, true);
+	}
+
+	// Rotational forces caused by... inputs
+	if (PitchMultiplierThisFrame != 0.f)
+	{
+		GetMesh()->AddTorqueInDegrees(Delta * PlaneMass * PitchAccelerationPerFrame * PitchMultiplierThisFrame * GetActorRightVector(), NAME_None, true);
+	}
+	if (YawMultiplierThisFrame != 0.f)
+	{
+		GetMesh()->AddTorqueInDegrees(Delta * PlaneMass * YawAccelerationPerFrame * YawMultiplierThisFrame * GetActorUpVector(), NAME_None, true);
+	}
+	if (RollMultiplierThisFrame != 0.f)
+	{
+		GetMesh()->AddTorqueInDegrees(Delta * PlaneMass * RollAccelerationPerFrame * RollMultiplierThisFrame * GetActorForwardVector(), NAME_None, true);
+	}
 	
 	// Update phsyics material
 	UpdatePhysicsMaterial();
@@ -246,6 +276,8 @@ void ASkyboundPawn::Tick(float Delta)
 			InternalCamera->RelativeRotation = HeadRotation;
 		}
 	}	
+
+	ResetFrameData();
 }
 
 void ASkyboundPawn::BeginPlay()
@@ -266,6 +298,8 @@ void ASkyboundPawn::BeginPlay()
 	EnableIncarView(bWantInCar);
 	// Start an engine sound playing
 	EngineSoundComponent->Play();
+
+	GetMesh()->AddImpulse(InitialVelocity * GetActorForwardVector(), NAME_None, true);
 }
 
 void ASkyboundPawn::OnResetVR()
@@ -339,5 +373,14 @@ void ASkyboundPawn::UpdatePhysicsMaterial()
 		}
 	}
 }
+
+void ASkyboundPawn::ResetFrameData()
+{
+	PitchMultiplierThisFrame = 0.f;
+	YawMultiplierThisFrame = 0.f;
+	RollMultiplierThisFrame = 0.f;
+	AccelerationMultiplierThisFrame = 0.f;
+}
+
 
 #undef LOCTEXT_NAMESPACE

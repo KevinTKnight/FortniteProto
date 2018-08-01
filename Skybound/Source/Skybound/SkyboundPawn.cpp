@@ -137,34 +137,22 @@ void ASkyboundPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInput
 
 void ASkyboundPawn::Pitch(float Val)
 {
-	if (Val != 0)
-	{
-		GetMesh()->AddTorqueInDegrees(PlaneMass * Val * PitchAccelerationPerFrame * GetActorRightVector(), NAME_None, true);
-	}
+	PitchMultiplierThisFrame = Val;
 }
 
 void ASkyboundPawn::Yaw(float Val)
 {
-	if (Val != 0)
-	{
-		GetMesh()->AddTorqueInDegrees(PlaneMass * Val * YawAccelerationPerFrame * GetActorUpVector(), NAME_None, true);
-	}
+	YawMultiplierThisFrame = Val;
 }
 
 void ASkyboundPawn::Roll(float Val)
 {
-	if (Val != 0)
-	{
-		GetMesh()->AddTorqueInDegrees(PlaneMass * Val * RollAccelerationPerFrame * GetActorForwardVector(), NAME_None, true);
-	}
+	RollMultiplierThisFrame = Val;
 }
 
 void ASkyboundPawn::Accelerate(float Val)
 {
-	if (Val != 0.f)
-	{
-		GetMesh()->AddForce(PlaneMass * this->GetActorForwardVector() * BaseEngineAcceleration * Val, NAME_None, true);
-	}
+	AccelerationMultiplierThisFrame = Val;
 }
 
 void ASkyboundPawn::MoveRight(float Val)
@@ -231,7 +219,7 @@ void ASkyboundPawn::Tick(float Delta)
 	GetMesh()->AddForce(Delta * DragCoefficient * -HorizontalForwardVector * LiftAndDragScalingValue, NAME_None, true);
 
 	// Forward acceleration caused by engine (and backwards acceleration caused by brakes)
-	if (AccelerationMultiplierThisFrame)
+	if (AccelerationMultiplierThisFrame != 0.f)
 	{
 		GetMesh()->AddForce(Delta * PlaneMass * BaseEngineAcceleration * AccelerationMultiplierThisFrame * GetActorForwardVector(), NAME_None, true);
 	}

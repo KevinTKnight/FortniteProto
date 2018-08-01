@@ -97,7 +97,7 @@ public:
 
 	/* Engine force applied via ActorForwardVector per second = PlaneMass * BaseEngineAcceleration */
 	UPROPERTY(Category = Flight, EditAnywhere)
-	float BaseEngineAcceleration = 2.0f;
+	float BaseEngineAcceleration = 120.0f;
 
 	/* Drag Force applied against horizontal velocity per second: DragCoefficient * 0.5f * AirDensity * HorizontalVelocityMagnitudeSquared * WingArea */
 	UPROPERTY(Category = Flight, EditAnywhere)
@@ -121,15 +121,15 @@ public:
 
 	/* Pitch Torque per second = PlaneMass * PitchAccelerationPerFrame */
 	UPROPERTY(Category = Flight, EditAnywhere)
-	float PitchAccelerationPerFrame = 0.1f;
+	float PitchAccelerationPerFrame = 6.0f;
 
 	/* Yaw Torque per second = PlaneMass * YawAccelerationPerFrame */
 	UPROPERTY(Category = Flight, EditAnywhere)
-	float YawAccelerationPerFrame = 0.1f;
+	float YawAccelerationPerFrame = 6.0f;
 
 	/* Roll Torque per second = PlaneMass * YawAccelerationPerFrame */
 	UPROPERTY(Category = Flight, EditAnywhere)
-	float RollAccelerationPerFrame = 0.1f;
+	float RollAccelerationPerFrame = 6.0f;
 	
 	/****** INPUT BINDING FUNCTION*****/
 	/** Handle Pitch input */

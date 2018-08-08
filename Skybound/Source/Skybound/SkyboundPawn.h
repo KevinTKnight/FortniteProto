@@ -93,19 +93,22 @@ public:
 
 	/* In meters per second */
 	UPROPERTY(Category = Flight, EditAnywhere)
-	float InitialVelocity = 2000.0f;
+	float InitialVelocity = 1120.0f;
 
 	/* Engine force applied via ActorForwardVector per second = PlaneMass * BaseEngineAcceleration */
 	UPROPERTY(Category = Flight, EditAnywhere)
-	float BaseEngineAcceleration = 120.0f;
+	float BaseEngineAcceleration = 20.0f;
 
 	/* Drag Force applied against horizontal velocity per second: DragCoefficient * 0.5f * AirDensity * HorizontalVelocityMagnitudeSquared * WingArea */
 	UPROPERTY(Category = Flight, EditAnywhere)
-	float DragCoefficient = 0.01f;
+	float DragCoefficient = 0.0f;
 
 	/* Lift Force applied via ActorUpVector per second: LiftCoefficient * 0.5f * AirDensity * HorizontalVelocityMagnitudeSquared * WingArea */
 	UPROPERTY(Category = Flight, EditAnywhere)
 	float LiftCoefficient = 0.01f;
+
+	UPROPERTY(Category = Flight, EditAnywhere)
+	float AOAScaling = 6.0f;
 
 	/* Scales linearly with Lift/Drag */
 	UPROPERTY(Category = Flight, EditAnywhere)

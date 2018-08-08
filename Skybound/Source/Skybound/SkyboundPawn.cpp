@@ -202,21 +202,30 @@ void ASkyboundPawn::Tick(float Delta)
 {
 	Super::Tick(Delta);
 
-	FVector HorizontalVelocity = GetVelocity();
-	HorizontalVelocity.Z = 0.f;
+	FVector Forward = GetActorForwardVector();
+	FVector NormalizedVelocity = GetVelocity();
+	NormalizedVelocity.Normalize();
 
-	FVector HorizontalForwardVector = HorizontalVelocity;
-	HorizontalForwardVector.Normalize();
+	float AOA = FMath::Acos(FVector::DotProduct(NormalizedVelocity, Forward));
+	
+	// HACK: need to find a better way to get positive/negative AOA
+	bool positiveAOA = Forward.Z >= NormalizedVelocity.Z;
+	if (!positiveAOA)
+	{
+		AOA *= -1.f;
+	}
+
+	float DynamicLiftCoefficient = LiftCoefficient * AOA * AOAScaling;
 
 	// Overall velocity projected on the forward vector to get forward velocity
-	float HorizontalVelocityMagnitudeSquared = HorizontalVelocity.SizeSquared();
-	float LiftAndDragScalingValue = 0.5f * AirDensity * HorizontalVelocityMagnitudeSquared * WingArea;
+	float VelocityMagnitudeSquared = GetVelocity().SizeSquared();
+	float LiftAndDragScalingValue = 0.5f * AirDensity * VelocityMagnitudeSquared * WingArea;
 	
 	// Upward lift force caused by forward motion
-	GetMesh()->AddForce(Delta * LiftCoefficient * GetActorUpVector() * LiftAndDragScalingValue, NAME_None, true);
+	GetMesh()->AddForce(Delta * DynamicLiftCoefficient * GetActorUpVector() * LiftAndDragScalingValue, NAME_None, true);
 
 	// Backward drag force cause by forward motion
-	GetMesh()->AddForce(Delta * DragCoefficient * -HorizontalForwardVector * LiftAndDragScalingValue, NAME_None, true);
+	GetMesh()->AddForce(Delta * DragCoefficient * -Forward * LiftAndDragScalingValue, NAME_None, true);
 
 	// Forward acceleration caused by engine (and backwards acceleration caused by brakes)
 	if (AccelerationMultiplierThisFrame != 0.f)

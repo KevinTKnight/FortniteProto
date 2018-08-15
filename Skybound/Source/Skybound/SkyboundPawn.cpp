@@ -203,13 +203,17 @@ void ASkyboundPawn::Tick(float Delta)
 	Super::Tick(Delta);
 
 	FVector Forward = GetActorForwardVector();
+	FVector Up = GetActorUpVector();
 	FVector NormalizedVelocity = GetVelocity();
 	NormalizedVelocity.Normalize();
 
 	float AOA = FMath::Acos(FVector::DotProduct(NormalizedVelocity, Forward));
+
+	float UpToForwardDot = FVector::DotProduct(Up, Forward); // This will always end up being 0
+	float UpToVelocityDot = FVector::DotProduct(Up, NormalizedVelocity);
 	
-	// HACK: need to find a better way to get positive/negative AOA
-	bool positiveAOA = Forward.Z >= NormalizedVelocity.Z;
+	// If the plane's nose is pointing higher than the direction it's traveling in, that's a positive AoA
+	bool positiveAOA = UpToForwardDot >= UpToVelocityDot;
 	if (!positiveAOA)
 	{
 		AOA *= -1.f;
@@ -222,7 +226,7 @@ void ASkyboundPawn::Tick(float Delta)
 	float LiftAndDragScalingValue = 0.5f * AirDensity * VelocityMagnitudeSquared * WingArea;
 	
 	// Upward lift force caused by forward motion
-	GetMesh()->AddForce(Delta * DynamicLiftCoefficient * GetActorUpVector() * LiftAndDragScalingValue, NAME_None, true);
+	GetMesh()->AddForce(Delta * DynamicLiftCoefficient * Up * LiftAndDragScalingValue, NAME_None, true);
 
 	// Backward drag force cause by forward motion
 	GetMesh()->AddForce(Delta * DragCoefficient * -NormalizedVelocity * LiftAndDragScalingValue, NAME_None, true);
@@ -230,7 +234,7 @@ void ASkyboundPawn::Tick(float Delta)
 	// Forward acceleration caused by engine (and backwards acceleration caused by brakes)
 	if (AccelerationMultiplierThisFrame != 0.f)
 	{
-		GetMesh()->AddForce(Delta * PlaneMass * BaseEngineAcceleration * AccelerationMultiplierThisFrame * GetActorForwardVector(), NAME_None, true);
+		GetMesh()->AddForce(Delta * PlaneMass * BaseEngineAcceleration * AccelerationMultiplierThisFrame * Forward, NAME_None, true);
 	}
 
 	// Rotational forces caused by... inputs
@@ -240,11 +244,11 @@ void ASkyboundPawn::Tick(float Delta)
 	}
 	if (YawMultiplierThisFrame != 0.f)
 	{
-		GetMesh()->AddTorqueInDegrees(Delta * PlaneMass * YawAccelerationPerFrame * YawMultiplierThisFrame * GetActorUpVector(), NAME_None, true);
+		GetMesh()->AddTorqueInDegrees(Delta * PlaneMass * YawAccelerationPerFrame * YawMultiplierThisFrame * Up, NAME_None, true);
 	}
 	if (RollMultiplierThisFrame != 0.f)
 	{
-		GetMesh()->AddTorqueInDegrees(Delta * PlaneMass * RollAccelerationPerFrame * RollMultiplierThisFrame * GetActorForwardVector(), NAME_None, true);
+		GetMesh()->AddTorqueInDegrees(Delta * PlaneMass * RollAccelerationPerFrame * RollMultiplierThisFrame * Forward, NAME_None, true);
 	}
 	
 	// Update phsyics material

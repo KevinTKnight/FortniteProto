@@ -225,7 +225,7 @@ void ASkyboundPawn::Tick(float Delta)
 	GetMesh()->AddForce(Delta * DynamicLiftCoefficient * GetActorUpVector() * LiftAndDragScalingValue, NAME_None, true);
 
 	// Backward drag force cause by forward motion
-	GetMesh()->AddForce(Delta * DragCoefficient * -Forward * LiftAndDragScalingValue, NAME_None, true);
+	GetMesh()->AddForce(Delta * DragCoefficient * -NormalizedVelocity * LiftAndDragScalingValue, NAME_None, true);
 
 	// Forward acceleration caused by engine (and backwards acceleration caused by brakes)
 	if (AccelerationMultiplierThisFrame != 0.f)

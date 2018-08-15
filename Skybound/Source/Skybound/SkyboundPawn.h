@@ -107,8 +107,13 @@ public:
 	UPROPERTY(Category = Flight, EditAnywhere)
 	float LiftCoefficient = 0.01f;
 
+	/* Number of degrees to add to the actual AoA. Can be used to represent wings that are angled in relation to the plane body. */
 	UPROPERTY(Category = Flight, EditAnywhere)
-	float AOAScaling = 6.0f;
+	float AOAOffset = 0.f;
+
+	/* Multiplied by the actual AoA to create lift due to AoA. Higher AoAScaling means more drastic velocity changes when pitching the plane up and down. */
+	UPROPERTY(Category = Flight, EditAnywhere)
+	float AOAScaling = 0.14f;
 
 	/* Scales linearly with Lift/Drag */
 	UPROPERTY(Category = Flight, EditAnywhere)

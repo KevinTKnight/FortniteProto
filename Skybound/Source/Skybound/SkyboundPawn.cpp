@@ -203,11 +203,15 @@ void ASkyboundPawn::Tick(float Delta)
 	Super::Tick(Delta);
 
 	FVector Forward = GetActorForwardVector();
+	FVector Right = GetActorRightVector();
 	FVector Up = GetActorUpVector();
+
+	Forward = Forward.RotateAngleAxis(-AOAOffset, Right);
+
 	FVector NormalizedVelocity = GetVelocity();
 	NormalizedVelocity.Normalize();
 
-	float AOA = FMath::Acos(FVector::DotProduct(NormalizedVelocity, Forward));
+	float AOA = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(NormalizedVelocity, Forward)));
 
 	float UpToForwardDot = FVector::DotProduct(Up, Forward); // This will always end up being 0
 	float UpToVelocityDot = FVector::DotProduct(Up, NormalizedVelocity);
@@ -240,7 +244,7 @@ void ASkyboundPawn::Tick(float Delta)
 	// Rotational forces caused by... inputs
 	if (PitchMultiplierThisFrame != 0.f)
 	{
-		GetMesh()->AddTorqueInDegrees(Delta * PlaneMass * PitchAccelerationPerFrame * PitchMultiplierThisFrame * GetActorRightVector(), NAME_None, true);
+		GetMesh()->AddTorqueInDegrees(Delta * PlaneMass * PitchAccelerationPerFrame * PitchMultiplierThisFrame * Right, NAME_None, true);
 	}
 	if (YawMultiplierThisFrame != 0.f)
 	{

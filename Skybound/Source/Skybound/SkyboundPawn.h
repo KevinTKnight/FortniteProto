@@ -84,7 +84,7 @@ public:
 	virtual void Tick(float Delta) override;
 
 	/** Returns Mesh subobject **/
-	FORCEINLINE USkeletalMeshComponent* ASkyboundPawn::GetMesh() const { return Mesh; }
+	FORCEINLINE UStaticMeshComponent* ASkyboundPawn::GetMesh() const { return Mesh; }
 protected:
 	virtual void BeginPlay() override;
 
@@ -202,9 +202,9 @@ private:
 	/** Non Slippery Material instance */
 	UPhysicalMaterial* NonSlipperyMaterial;
 
-	/** The main skeletal mesh associated with this Character (optional sub-object). */
+	/** The main static mesh associated with this Character (optional sub-object). */
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class USkeletalMeshComponent* Mesh;
+	class UStaticMeshComponent* Mesh;
 
 public:
 	/** Returns SpringArm subobject **/

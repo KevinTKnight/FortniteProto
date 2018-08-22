@@ -5,6 +5,7 @@
 #include "SkyboundWheelRear.h"
 #include "SkyboundHud.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
@@ -14,6 +15,7 @@
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "WheeledVehicleMovementComponent4W.h"
 #include "Engine/SkeletalMesh.h"
+#include "Engine/StaticMesh.h"
 #include "Engine/Engine.h"
 #include "GameFramework/Controller.h"
 #include "UObject/ConstructorHelpers.h"
@@ -34,17 +36,17 @@ const FName ASkyboundPawn::EngineAudioRPM("RPM");
 
 ASkyboundPawn::ASkyboundPawn()
 {
-	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkyboundMeshComponent"));
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SkyboundMeshComponent"));
 	Mesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	Mesh->BodyInstance.bSimulatePhysics = true;
 	RootComponent = Mesh;
 
 	// Car mesh
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CarMesh(TEXT("/Game/Geometry/Meshes/PlaneTest.PlaneTest"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> CarMesh(TEXT("/Game/Geometry/Meshes/PlaneTest.PlaneTest"));
 	
 	if (GetMesh())
 	{
-		GetMesh()->SetSkeletalMesh(CarMesh.Object);
+		GetMesh()->SetStaticMesh(CarMesh.Object);
 		GetMesh()->SetRelativeScale3D(FVector(3.0f, 1.0f, 1.0f));
 	}
 

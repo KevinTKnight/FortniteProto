@@ -210,7 +210,10 @@ void ASkyboundPawn::Tick(float Delta)
 
 	Forward = Forward.RotateAngleAxis(-AOAOffset, Right);
 
+	// Get velocity direction on the Up/Forward axes only
 	FVector NormalizedVelocity = GetVelocity();
+	NormalizedVelocity.ProjectOnToNormal(Right);
+	FVector::VectorPlaneProject(NormalizedVelocity, Right);
 	NormalizedVelocity.Normalize();
 
 	float AOA = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(NormalizedVelocity, Forward)));
